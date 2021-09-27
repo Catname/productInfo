@@ -1,5 +1,5 @@
 {
-    "name": "catname\/productInfo",
+    "name": "catname\/productinfo",
     "description": "Get product information by GS1 code",
     "license": "MIT",
     "authors": [
@@ -8,7 +8,11 @@
             "email": "tomcath@foxmail.com"
         }
     ],
-    "require": {},
+    "require": {
+        "php": "^7.3",
+        "guzzlehttp/guzzle": "^7.0.1",
+        "voku/simple_html_dom": "^4.7"
+    },
     "autoload": {
         "psr-4": {
             "Catname\\ProductInfo\\": "src"
