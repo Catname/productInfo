@@ -1,0 +1,17 @@
+{
+    "name": "catname\/productInfo",
+    "description": "Get product information by GS1 code",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "ZhangHQ",
+            "email": "tomcath@foxmail.com"
+        }
+    ],
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "Catname\\ProductInfo\\": "src"
+        }
+    }
+}
