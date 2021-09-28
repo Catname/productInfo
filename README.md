@@ -2,26 +2,37 @@
 
 <p align="center"> Get product information by GS1 code.</p>
 
+### Author: ZhangHQ
 
 ## Installing
 
 ```shell
-$ composer require catname/productInfo -vvv
+$ composer require catname/productinfo
 ```
 
 ## Usage
 
-TODO
+```php
+use Catname\ProductInfo\ProductInfo;
 
-## Contributing
+class example
+{
+    public function aExample(Request $request)
+    {
+        $productInfo = new ProductInfo();
+        return $productInfo->getProductInfo($request->code);
+    }
+    
+    /**
+    * array (size=4)
+        'code' => string '06907992512570' (length=14)
+        'supplier' => string '内蒙古伊利实业集团股份有限公司' (length=45)
+        'name' => string '安慕希希腊风味酸奶205克' (length=33)
+        'specs' => string '205克' (length=6)
+    */
+}
+```
 
-You can contribute in one of three ways:
-
-1. File bug reports using the [issue tracker](https://github.com/catname/productInfo/issues).
-2. Answer questions or fix bugs on the [issue tracker](https://github.com/catname/productInfo/issues).
-3. Contribute new features or update the wiki.
-
-_The code contribution process is not very formal. You just need to make sure that you follow the PSR-0, PSR-1, and PSR-2 coding guidelines. Any new code contributions must be accompanied by unit tests where applicable._
 
 ## License
 
