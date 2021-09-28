@@ -17,5 +17,12 @@
         "psr-4": {
             "Catname\\ProductInfo\\": "src"
         }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Catname\\ProductInfo\\ServiceProvider"
+            ]
+        }
     }
 }
