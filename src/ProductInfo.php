@@ -64,7 +64,7 @@ class ProductInfo
             $productInfo = [
                 'code'     => $item->gtin,
                 'supplier' => $item->firm_name,
-                'name'     => $item->brandcn,
+                'name'     => $item->description,
                 'specs'    => $item->specification,
             ];
             //返回结果
