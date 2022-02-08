@@ -6,14 +6,11 @@
 namespace Catname\ProductInfo;
 
 use GuzzleHttp\Client;
-use voku\helper\HtmlDomParser;
 
 class ProductInfo
 {
     protected $client;
     protected $url;
-    protected $getCookieURL = 'http://search.anccnet.com/writeSession.aspx?responseResult=check_ok';
-    protected $cookie;
     protected $headers;
     public $message;
 
@@ -21,10 +18,21 @@ class ProductInfo
     {
         $this->client = new Client();
         $this->headers = [
-            'Accept' => '*/*',
-            'User-Agent' => $this->getUserAgent(),
-            'Accept-Encoding' => 'gzip, deflate',
-            'Accept-Language' => 'zh-CN,zh;q=0.9'
+            'Accept'             => 'application/json, text/plain, */*',
+            'Accept-Encoding'    => 'gzip, deflate, br',
+            'Accept-Language'    => 'zh-CN,zh;q=0.9',
+            'Connection'         => 'keep-alive',
+            'Host'               => 'bff.gds.org.cn',
+            'Origin'             => 'https://www.gds.org.cn',
+            'Referer'            => 'https://www.gds.org.cn/',
+            'sec-ch-ua'          => '" Not A;Brand";v="99", "Chromium";v="98", "Google Chrome";v="98"',
+            'sec-ch-ua-mobile'   => '?0',
+            'sec-ch-ua-platform' => '"Windows"',
+            'Sec-Fetch-Dest'     => 'empty',
+            'Sec-Fetch-Mode'     => 'cors',
+            'Sec-Fetch-Site'     => 'same-site',
+            'User-Agent'         => $this->getUserAgent(),
+
         ];
     }
 
@@ -38,53 +46,33 @@ class ProductInfo
      */
     public function getProductInfo($code)
     {
-        $this->url = 'http://search.anccnet.com/searchResult2.aspx?keyword=' . $code;
-        $this->headers['Cookie'] = $this->getCookie();// 必须在url赋值后调用
-
-        if ($this->headers['Cookie'] == false) {
-            $this->message = '操作失败：获取Cookie失败';
-            return false;
-        }
+        $this->url = 'https://bff.gds.org.cn/gds/searching-api/ProductService/ProductListByGTIN';
 
         $response = $this->client->request('GET', $this->url, [
-            'headers' => $this->headers
+            'headers' => $this->headers,
+            'query'   => [
+                'PageSize'   => 30,
+                'PageIndex'  => 1,
+                'SearchItem' => $code,
+            ]
         ]);
 
-        $html = HtmlDomParser::str_get_html($response->getBody()->getContents());
-
+        $result = json_decode($response->getBody()->getContents());
         // 构造结果
-        $productInfo = [
-            'code' => $html->find('#results > li > div > dl.p-info > dd:nth-child(2) > a', 0)->plaintext,
-            'supplier' => $html->find('#repList_ctl00_firmLink',0)->plaintext,
-            'name' => $html->find('#results > li > div > dl.p-info > dd:nth-child(6)', 0)->plaintext,
-            'specs' => $html->find('#results > li > div > dl.p-info > dd:nth-child(8)', 0)->plaintext,
-        ];
-
-        //返回结果
-        return $productInfo;
-
-    }
-
-    /**
-     * @return false|mixed|string
-     * @throws \GuzzleHttp\Exception\GuzzleException
-     * @author: ZhangHQ
-     * @email : tomcath@foxmail.com
-     */
-    protected function getCookie()
-    {
-        $this->headers['Referer'] = $this->url;
-        unset($this->headers['Cookie']);
-        $response = $this->client->request('GET', $this->getCookieURL, [
-            'headers' => $this->headers
-        ]);
-        if ($response->getStatusCode() == 200) {
-            $cookie = $response->getHeader('Set-Cookie');
-            return explode(';', $cookie[0])[0];
+        if ($result->Msg == 'Success') {
+            $item = $result->Data->Items[0];
+            $productInfo = [
+                'code'     => $item->gtin,
+                'supplier' => $item->firm_name,
+                'name'     => $item->brandcn,
+                'specs'    => $item->specification,
+            ];
+            //返回结果
+            return $productInfo;
         } else {
+            $this->message = $result->Msg;
             return false;
         }
-
     }
 
     /**
@@ -95,6 +83,7 @@ class ProductInfo
     protected function getUserAgent(): string
     {
         $userAgents = [
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.82 Safari/537.36',
             'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.61 Safari/537.36',
             'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.77 Safari/537.36',
             'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.159 Safari/537.36',
@@ -104,6 +93,4 @@ class ProductInfo
         ];
         return $userAgents[array_rand($userAgents)];
     }
-
-
 }

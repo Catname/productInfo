@@ -11,7 +11,7 @@
     "require": {
         "php": "^7.3",
         "guzzlehttp/guzzle": "^7.0.1",
-        "voku/simple_html_dom": "^4.7"
+        "ext-json": "*"
     },
     "autoload": {
         "psr-4": {
