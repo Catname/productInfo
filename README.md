@@ -33,6 +33,11 @@ class example
 }
 ```
 
+## Update
+
+```bash
+composer update catname/productinfo
+```
 
 ## License
 
